@@ -1,0 +1,187 @@
+// Prisma Schema for SAB Repeat/Medical Exam Application
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  STAFF
+  REGISTRAR
+  FINANCE
+  SUPER_ADMIN
+}
+
+enum Title {
+  MR
+  MS
+}
+
+enum ApplicationStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  FINANCE_REVIEW
+  FINANCE_APPROVED
+  FINANCE_REJECTED
+  APPROVED
+  REJECTED
+}
+
+enum SubjectCategory {
+  MEDICAL
+  REPEAT
+  FIRST_ATTEMPT
+}
+
+model User {
+  id                 String   @id @default(uuid())
+  email              String   @unique
+  passwordHash       String   @map("password_hash")
+  role               Role     @default(STUDENT)
+  title              Title?
+  fullName           String   @map("full_name")
+  nameWithInitials   String?  @map("name_with_initials")
+  permanentAddress   String?  @map("permanent_address")
+  postalAddress      String?  @map("postal_address")
+  phoneHome          String?  @map("phone_home")
+  phoneMobile        String?  @map("phone_mobile")
+  nicPassportNo      String?  @unique @map("nic_passport_no")
+  sabRegistrationNo  String?  @unique @map("sab_registration_no")
+  intake             String?
+  isActive           Boolean  @default(true) @map("is_active")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  applications       Application[]  @relation("StudentApplications")
+  reviewedApps       Application[]  @relation("ReviewedApplications")
+  approvedApps       Application[]  @relation("ApprovedApplications")
+  financeReviewedApps Application[] @relation("FinanceReviewedApplications")
+  auditLogs          AuditLog[]
+
+  @@map("users")
+}
+
+model Course {
+  id          String   @id @default(uuid())
+  courseCode  String   @unique @map("course_code")
+  courseTitle String   @map("course_title")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  applicationSubjects ApplicationSubject[]
+
+  @@map("courses")
+}
+
+model ExamPeriod {
+  id        String   @id @default(uuid())
+  name      String
+  startDate DateTime @map("start_date")
+  endDate   DateTime @map("end_date")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  applications Application[]
+
+  @@map("exam_periods")
+}
+
+model Application {
+  id               String            @id @default(uuid())
+  userId           String            @map("user_id")
+  examPeriodId     String?           @map("exam_period_id")
+  status           ApplicationStatus @default(DRAFT)
+  paymentReference String?           @map("payment_reference")
+  paymentSlipPath  String?           @map("payment_slip_path")
+  totalFee         Decimal?          @map("total_fee") @db.Decimal(10, 2)
+  medicalCertPath  String?           @map("medical_cert_path")
+  declarationText  String?           @map("declaration_text")
+  declaredAt       DateTime?         @map("declared_at")
+  reviewedById     String?           @map("reviewed_by_id")
+  reviewedAt       DateTime?         @map("reviewed_at")
+  reviewNotes      String?           @map("review_notes")
+  financeReviewedById String?        @map("finance_reviewed_by_id")
+  financeReviewedAt   DateTime?      @map("finance_reviewed_at")
+  financeNotes        String?        @map("finance_notes")
+  approvedById     String?           @map("approved_by_id")
+  approvedAt       DateTime?         @map("approved_at")
+  approvalNotes    String?           @map("approval_notes")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+
+  user             User              @relation("StudentApplications", fields: [userId], references: [id])
+  examPeriod       ExamPeriod?       @relation(fields: [examPeriodId], references: [id])
+  reviewedBy       User?             @relation("ReviewedApplications", fields: [reviewedById], references: [id])
+  approvedBy       User?             @relation("ApprovedApplications", fields: [approvedById], references: [id])
+  financeReviewedBy User?            @relation("FinanceReviewedApplications", fields: [financeReviewedById], references: [id])
+  subjects         ApplicationSubject[]
+  medicalDetails   MedicalExamDetail[]
+  repeatDetails    RepeatExamDetail[]
+
+  @@map("applications")
+}
+
+model ApplicationSubject {
+  id                String          @id @default(uuid())
+  applicationId     String          @map("application_id")
+  courseId           String          @map("course_id")
+  category          SubjectCategory
+  caMarks           Decimal?        @map("ca_marks") @db.Decimal(5, 2)
+  upcomingExamDate  DateTime?       @map("upcoming_exam_date")
+  upcomingExamIntake String?        @map("upcoming_exam_intake")
+
+  application       Application     @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  course            Course          @relation(fields: [courseId], references: [id])
+
+  @@map("application_subjects")
+}
+
+model MedicalExamDetail {
+  id            String      @id @default(uuid())
+  applicationId String      @map("application_id")
+  courseCode    String       @map("course_code")
+  courseTitle   String       @map("course_title")
+  examDate     DateTime?    @map("exam_date")
+  intakeDetails String?     @map("intake_details")
+
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@map("medical_exam_details")
+}
+
+model RepeatExamDetail {
+  id                  String      @id @default(uuid())
+  applicationId       String      @map("application_id")
+  courseCode           String      @map("course_code")
+  courseTitle          String      @map("course_title")
+  examDate            DateTime?   @map("exam_date")
+  intakeDetails       String?     @map("intake_details")
+  gradeEarned         String?     @map("grade_earned")
+  examDivConfirmation Boolean     @default(false) @map("exam_div_confirmation")
+
+  application         Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@map("repeat_exam_details")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?  @map("user_id")
+  action     String
+  entityType String   @map("entity_type")
+  entityId   String?  @map("entity_id")
+  details    Json?
+  ipAddress  String?  @map("ip_address")
+  userAgent  String?  @map("user_agent")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user       User?    @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}

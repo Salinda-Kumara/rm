@@ -1,0 +1,448 @@
+/* Print layout styles matching the physical PDF form */
+
+.printWrapper {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px;
+  background: white;
+  color: #000;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.4;
+  font-size: 13px;
+}
+
+/* Print Toolbar (no-print) */
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 16px 24px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.toolbarTitle {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 14px;
+}
+
+.toolbarActions {
+  display: flex;
+  gap: 12px;
+}
+
+.btnPrint {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  transition: background 0.15s;
+}
+
+.btnPrint:hover {
+  background: #1d4ed8;
+}
+
+.btnCancel {
+  background: white;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  padding: 8px 16px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.15s;
+}
+
+.btnCancel:hover {
+  background: #f1f5f9;
+}
+
+/* Header layout */
+.headerContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #000;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.logoArea {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.caLogo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #ccc;
+  padding-right: 12px;
+}
+
+.caText {
+  font-size: 28px;
+  font-weight: 800;
+  color: #334155;
+  line-height: 1;
+}
+
+.caSubText {
+  font-size: 7px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.crestLogo {
+  width: 45px;
+  height: 45px;
+  color: #b91c1c;
+}
+
+.headerText {
+  flex: 1;
+  text-align: center;
+  padding: 0 16px;
+}
+
+.titlePrimary {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.titleSecondary {
+  font-size: 11px;
+  font-weight: 500;
+  margin: 3px 0 0;
+  color: #334155;
+}
+
+.titleTertiary {
+  font-size: 10px;
+  margin: 2px 0 0;
+  color: #64748b;
+}
+
+.examTitle {
+  font-size: 13px;
+  font-weight: 700;
+  margin-top: 10px;
+  text-transform: uppercase;
+  border-bottom: 1px dashed #000;
+  display: inline-block;
+  padding-bottom: 1px;
+}
+
+.subTitle {
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 4px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* Bank details table */
+.bankTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  font-size: 11px;
+}
+
+.bankTable th, .bankTable td {
+  border: 1px solid #000;
+  padding: 6px 12px;
+  text-align: center;
+}
+
+.bankTable th {
+  background: #f1f5f9;
+  font-weight: 700;
+}
+
+.bankTable td {
+  font-weight: 600;
+}
+
+/* Form layout rows */
+.formRow {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+
+.rowLabel {
+  width: 250px;
+  display: flex;
+  justify-content: space-between;
+  padding-right: 12px;
+  font-weight: 500;
+}
+
+.labelText {
+  flex: 1;
+}
+
+.labelNum {
+  width: 24px;
+  font-weight: 600;
+}
+
+.rowValue {
+  flex: 1;
+  border-bottom: 1px dashed #000;
+  padding-left: 8px;
+  font-weight: 600;
+  min-height: 18px;
+}
+
+.telephoneGrid {
+  display: flex;
+  gap: 16px;
+  flex: 1;
+}
+
+.telItem {
+  display: flex;
+  align-items: baseline;
+  flex: 1;
+}
+
+.telLabel {
+  font-weight: 500;
+  margin-right: 6px;
+}
+
+.telValue {
+  flex: 1;
+  border-bottom: 1px dashed #000;
+  font-weight: 600;
+  min-height: 18px;
+  padding-left: 4px;
+}
+
+/* NIC and Date boxes */
+.boxGrid {
+  display: inline-flex;
+  border: 1px solid #000;
+  border-right: none;
+  vertical-align: middle;
+}
+
+.charBox {
+  width: 20px;
+  height: 22px;
+  border-right: 1px solid #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+/* Tables */
+.tableTitle {
+  font-size: 12px;
+  font-weight: 700;
+  margin: 16px 0 8px;
+}
+
+.appTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+  font-size: 11px;
+}
+
+.appTable th, .appTable td {
+  border: 1px solid #000;
+  padding: 6px 8px;
+  text-align: left;
+}
+
+.appTable th {
+  background: #f1f5f9;
+  font-weight: 700;
+}
+
+.appTable td {
+  font-weight: 500;
+}
+
+.centerCol {
+  text-align: center !important;
+}
+
+.dateBoxContainer {
+  display: flex;
+  justify-content: center;
+}
+
+/* Notes section */
+.noteBox {
+  border: 1px solid #000;
+  padding: 10px 16px;
+  margin: 16px 0;
+  font-size: 11px;
+  background: #fafafa;
+}
+
+.noteBox p {
+  margin: 4px 0;
+  font-weight: 600;
+}
+
+.declarationText {
+  margin: 20px 0;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.signatureGrid {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px;
+  margin-bottom: 24px;
+}
+
+.sigLine {
+  width: 200px;
+  border-top: 1px dashed #000;
+  text-align: center;
+  padding-top: 4px;
+  font-size: 11px;
+}
+
+.officeUseContainer {
+  border: 1px solid #000;
+  padding: 16px;
+  margin-top: 24px;
+  page-break-inside: avoid;
+}
+
+.officeUseTitle {
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.officeUseNote {
+  font-weight: 500;
+  margin-bottom: 40px;
+}
+
+/* Printing Specific styles */
+/* Attachment sections for print */
+.attachmentSection {
+  page-break-before: always;
+  padding-top: 24px;
+  margin-top: 48px;
+}
+
+.attachmentTitle {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  border-bottom: 2px solid #000;
+  padding-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.attachmentContent {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #000;
+  padding: 12px;
+  background: #fff;
+  min-height: 400px;
+}
+
+.attachmentImage {
+  max-width: 100%;
+  max-height: 900px;
+  object-fit: contain;
+}
+
+.attachmentIframe {
+  width: 100%;
+  height: 900px;
+  border: none;
+}
+
+.attachmentHelpText {
+  font-size: 11px;
+  color: #475569;
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* Printing Specific styles */
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+  .printWrapper {
+    padding: 0;
+    max-width: 100%;
+  }
+  .toolbar {
+    display: none !important;
+  }
+  .attachmentHelpText {
+    display: none !important; /* Hide helper link text during printing */
+  }
+  .attachmentContent {
+    border: none;
+    padding: 0;
+  }
+  @page {
+    size: A4;
+    margin: 15mm;
+  }
+  
+  :global(.pdf-page-container) {
+    page-break-before: always !important;
+    page-break-inside: avoid !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  :global(.pdf-page-container canvas) {
+    max-width: 100% !important;
+    height: auto !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+}
