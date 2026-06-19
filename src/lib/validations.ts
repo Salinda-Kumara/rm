@@ -36,6 +36,25 @@ export const RegisterSchema = z.object({
   path: ['confirmPassword'],
 })
 
+export const StudentDetailsSchema = z.object({
+  fullName: z
+    .string()
+    .min(2, 'Full name must be at least 2 characters')
+    .max(200, 'Full name is too long'),
+  nameWithInitials: z
+    .string()
+    .min(2, 'Name with initials is required')
+    .max(100, 'Name with initials is too long'),
+  title: z.enum(['MR', 'MS'], { message: 'Please select a title' }),
+  email: z.string().email('Please enter a valid email address'),
+  permanentAddress: z.string().min(5, 'Address is required'),
+  phoneHome: z.string().optional().nullable(),
+  phoneMobile: z.string().min(9, 'Mobile number is required'),
+  nicPassportNo: z.string().min(5, 'NIC/Passport number is required'),
+  sabRegistrationNo: z.string().min(1, 'SAB Registration number is required'),
+  intake: z.string().min(1, 'Intake is required'),
+})
+
 // ============== Application Schemas ==============
 
 export const ApplicationSubjectSchema = z.object({
@@ -112,6 +131,7 @@ export const ReviewApplicationSchema = z.object({
 
 export type LoginInput = z.infer<typeof LoginSchema>
 export type RegisterInput = z.infer<typeof RegisterSchema>
+export type StudentDetailsInput = z.infer<typeof StudentDetailsSchema>
 export type CreateApplicationInput = z.infer<typeof CreateApplicationSchema>
 export type CourseInput = z.infer<typeof CourseSchema>
 export type ExamPeriodInput = z.infer<typeof ExamPeriodSchema>

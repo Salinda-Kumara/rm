@@ -9,5 +9,5 @@ export default async function Home() {
     redirect(getRoleDashboardPath(session.role))
   }
   
-  redirect('/login')
+  redirect('/new-application')
 }

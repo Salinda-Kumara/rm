@@ -17,6 +17,10 @@ export async function proxy(req: NextRequest) {
   const path = req.nextUrl.pathname
   const isPublicRoute = publicRoutes.includes(path)
   const isApiRoute = path.startsWith('/api')
+  const isPubliclyAccessible =
+    isPublicRoute ||
+    path.startsWith('/new-application') ||
+    path.startsWith('/dashboard/print-application')
 
   // Get session from cookie
   const cookie = req.cookies.get('session')?.value
@@ -36,16 +40,19 @@ export async function proxy(req: NextRequest) {
   }
 
   // If on protected route and not authenticated
-  if (!isPublicRoute && !isApiRoute && !session) {
+  if (!isPubliclyAccessible && !isApiRoute && !session) {
     return NextResponse.redirect(new URL('/login', req.nextUrl))
   }
 
   // Check role-based access for dashboard routes
   if (session && path.startsWith('/dashboard')) {
-    const hasAccess = checkRouteAccess(path, session.role)
-    if (!hasAccess) {
-      const dashboardPath = getDashboardPath(session.role)
-      return NextResponse.redirect(new URL(dashboardPath, req.nextUrl))
+    // print-application bypasses role check (accessible to any authenticated role as well)
+    if (!path.startsWith('/dashboard/print-application')) {
+      const hasAccess = checkRouteAccess(path, session.role)
+      if (!hasAccess) {
+        const dashboardPath = getDashboardPath(session.role)
+        return NextResponse.redirect(new URL(dashboardPath, req.nextUrl))
+      }
     }
   }
 

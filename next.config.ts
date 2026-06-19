@@ -30,6 +30,9 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+
+  // Enable standalone output for Docker containerization
+  output: 'standalone',
 };
 
 export default nextConfig;

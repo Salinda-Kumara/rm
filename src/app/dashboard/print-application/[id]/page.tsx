@@ -1,4 +1,3 @@
-import { requireRole } from '@/lib/session'
 import { getApplicationById } from '@/app/actions/applications'
 import { notFound } from 'next/navigation'
 import styles from './print.module.css'
@@ -11,8 +10,7 @@ const isImage = (filePath: string) => {
 }
 
 export default async function PrintApplicationPage(props: { params: Promise<{ id: string }> }) {
-  // Access control: only Staff and Registrar can print
-  await requireRole(['STAFF', 'REGISTRAR'])
+  // Access control: Staff/Registrar, or public access (UUID-based secure token)
   const { id } = await props.params
   const application = await getApplicationById(id)
 

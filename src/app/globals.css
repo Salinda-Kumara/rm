@@ -228,3 +228,17 @@ input, select, textarea {
   background: var(--color-primary-100);
   color: var(--color-primary-800);
 }
+
+/* ---------- Touch-friendly UX & iOS Zoom Prevention ---------- */
+@media (max-width: 768px) {
+  input, 
+  select, 
+  textarea {
+    font-size: 16px !important; /* Prevents auto-zoom on iOS */
+  }
+  
+  /* Tap highlight reset */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}

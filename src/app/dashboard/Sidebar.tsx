@@ -12,6 +12,8 @@ interface SidebarProps {
     fullName: string
     email: string
   }
+  isOpen?: boolean
+  onClose?: () => void
 }
 
 const menuItems: Record<string, Array<{ label: string; href: string; icon: string; section?: string }>> = {
@@ -55,7 +57,7 @@ const roleLabels: Record<string, string> = {
   SUPER_ADMIN: 'Administrator',
 }
 
-export function Sidebar({ session }: SidebarProps) {
+export function Sidebar({ session, isOpen, onClose }: SidebarProps) {
   const pathname = usePathname()
   const items = menuItems[session.role] || []
   const initials = session.fullName
@@ -74,13 +76,21 @@ export function Sidebar({ session }: SidebarProps) {
   }, {})
 
   return (
-    <aside className={styles.sidebar}>
+    <aside className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ''}`}>
       <div className={styles.sidebarBrand}>
         <div className={styles.sidebarLogo}>SAB</div>
         <div className={styles.sidebarBrandText}>
           <h2>Exam Portal</h2>
           <p>Applied Accounting</p>
         </div>
+        {/* Close button visible only on mobile */}
+        <button
+          className={styles.sidebarCloseBtn}
+          onClick={onClose}
+          aria-label="Close menu"
+        >
+          ✕
+        </button>
       </div>
 
       <nav className={styles.sidebarNav}>
@@ -92,6 +102,7 @@ export function Sidebar({ session }: SidebarProps) {
                 key={item.href}
                 href={item.href}
                 className={`${styles.navLink} ${pathname === item.href ? styles.navLinkActive : ''}`}
+                onClick={onClose}
               >
                 <span className={styles.navIcon}>{item.icon}</span>
                 {item.label}

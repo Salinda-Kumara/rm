@@ -2,8 +2,9 @@
 
 import { prisma } from '@/lib/prisma'
 import { getSession } from '@/lib/session'
-import { CreateApplicationSchema, ReviewApplicationSchema } from '@/lib/validations'
+import { CreateApplicationSchema, ReviewApplicationSchema, StudentDetailsSchema } from '@/lib/validations'
 import { createAuditLog } from '@/lib/audit'
+import bcrypt from 'bcryptjs'
 import { hasPermission } from '@/lib/rbac'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
@@ -22,9 +23,12 @@ const REPEAT_FEE = 2600
 
 export async function createApplication(prevState: ApplicationState, formData: FormData): Promise<ApplicationState> {
   const session = await getSession()
-  if (!session || !hasPermission(session.role, 'application:create')) {
+  if (session && !hasPermission(session.role, 'application:create')) {
     return { message: 'Unauthorized' }
   }
+
+  let application;
+  let isAnonymous = !session;
 
   try {
     // Parse JSON body from formData
@@ -39,6 +43,67 @@ export async function createApplication(prevState: ApplicationState, formData: F
     }
 
     const data = validated.data
+
+    let userId = session?.userId;
+
+    if (isAnonymous) {
+      // Validate student details
+      const studentDetails = StudentDetailsSchema.safeParse(parsedData.studentDetails)
+      if (!studentDetails.success) {
+        return { errors: studentDetails.error.flatten().fieldErrors }
+      }
+      const sd = studentDetails.data
+
+      // Find or create student user by Reg No or Email
+      let user = await prisma.user.findFirst({
+        where: {
+          OR: [
+            { sabRegistrationNo: sd.sabRegistrationNo },
+            { email: sd.email }
+          ]
+        }
+      })
+
+      if (user) {
+        // Update details with latest
+        user = await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            fullName: sd.fullName,
+            nameWithInitials: sd.nameWithInitials,
+            title: sd.title,
+            phoneMobile: sd.phoneMobile,
+            permanentAddress: sd.permanentAddress,
+            intake: sd.intake,
+            nicPassportNo: sd.nicPassportNo,
+          }
+        })
+      } else {
+        // Create user with dummy password hash since they don't login
+        const dummyPassword = Math.random().toString(36) + Math.random().toString(36)
+        const passwordHash = await bcrypt.hash(dummyPassword, 10)
+        user = await prisma.user.create({
+          data: {
+            email: sd.email,
+            passwordHash,
+            role: 'STUDENT',
+            title: sd.title,
+            fullName: sd.fullName,
+            nameWithInitials: sd.nameWithInitials,
+            permanentAddress: sd.permanentAddress,
+            phoneMobile: sd.phoneMobile,
+            nicPassportNo: sd.nicPassportNo,
+            sabRegistrationNo: sd.sabRegistrationNo,
+            intake: sd.intake,
+          }
+        })
+      }
+      userId = user.id
+    }
+
+    if (!userId) {
+      return { message: 'User identification failed.' }
+    }
 
     // Extract files
     const paymentSlipFile = formData.get('paymentSlip') as File | null
@@ -62,9 +127,9 @@ export async function createApplication(prevState: ApplicationState, formData: F
     }
 
     // Create application with related data
-    const application = await prisma.application.create({
+    application = await prisma.application.create({
       data: {
-        userId: session.userId,
+        userId,
         examPeriodId: data.examPeriodId || null,
         status: 'SUBMITTED',
         paymentReference: data.paymentReference || null,
@@ -106,7 +171,7 @@ export async function createApplication(prevState: ApplicationState, formData: F
     const headersList = await headers()
     const ip = headersList.get('x-forwarded-for') || 'unknown'
     await createAuditLog({
-      userId: session.userId,
+      userId,
       action: 'APPLICATION_CREATED',
       entityType: 'application',
       entityId: application.id,
@@ -119,7 +184,11 @@ export async function createApplication(prevState: ApplicationState, formData: F
     return { message: 'Failed to create application. Please try again.' }
   }
 
-  redirect('/dashboard/student/applications')
+  if (isAnonymous) {
+    redirect(`/new-application/success/${application.id}`)
+  } else {
+    redirect('/dashboard/student/applications')
+  }
 }
 
 export async function updateApplicationStatus(
@@ -229,7 +298,6 @@ export async function getApplications() {
 
 export async function getApplicationById(id: string) {
   const session = await getSession()
-  if (!session) return null
 
   const application = await prisma.application.findUnique({
     where: { id },
@@ -254,8 +322,8 @@ export async function getApplicationById(id: string) {
 
   if (!application) return null
 
-  // Students can only see their own applications
-  if (session.role === 'STUDENT' && application.userId !== session.userId) {
+  // If logged in as a STUDENT, ensure they can only see their own application
+  if (session && session.role === 'STUDENT' && application.userId !== session.userId) {
     return null
   }
 

@@ -2,7 +2,6 @@
 
 import { useActionState } from 'react'
 import { login, type AuthState } from '@/app/actions/auth'
-import Link from 'next/link'
 import styles from '../auth.module.css'
 
 export default function LoginPage() {
@@ -86,8 +85,8 @@ export default function LoginPage() {
           </form>
 
           <p className={styles.formFooter}>
-            Don&apos;t have an account?{' '}
-            <Link href="/register">Register here</Link>
+            Are you a student?{' '}
+            <a href="/new-application" style={{ color: 'var(--color-primary-600)', fontWeight: 700 }}>Apply for Exams here</a>
           </p>
         </div>
       </div>
