@@ -20,6 +20,8 @@ enum Role {
 enum Title {
   MR
   MS
+  MISS
+  MRS
 }
 
 enum ApplicationStatus {

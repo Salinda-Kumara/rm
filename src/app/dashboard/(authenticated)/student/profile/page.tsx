@@ -20,7 +20,7 @@ export default async function StudentProfilePage() {
       <div className={styles.detailGrid}>
         <div className={styles.detailCard}>
           <h3 className={styles.detailCardTitle}>👤 Personal Information</h3>
-          <div className={styles.detailRow}><span className={styles.detailLabel}>Title</span><span className={styles.detailValue}>{user.title === 'MR' ? 'Mr.' : 'Ms.'}</span></div>
+          <div className={styles.detailRow}><span className={styles.detailLabel}>Title</span><span className={styles.detailValue}>{user.title === 'MR' ? 'Mr.' : user.title === 'MS' ? 'Ms.' : user.title === 'MISS' ? 'Miss' : user.title === 'MRS' ? 'Mrs.' : '—'}</span></div>
           <div className={styles.detailRow}><span className={styles.detailLabel}>Full Name</span><span className={styles.detailValue}>{user.fullName}</span></div>
           <div className={styles.detailRow}><span className={styles.detailLabel}>Name with Initials</span><span className={styles.detailValue}>{user.nameWithInitials}</span></div>
           <div className={styles.detailRow}><span className={styles.detailLabel}>Email</span><span className={styles.detailValue}>{user.email}</span></div>

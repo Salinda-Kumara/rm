@@ -4,10 +4,11 @@
   gap: var(--space-2);
   margin-bottom: var(--space-8);
   padding: var(--space-6) var(--space-4);
-  background: white;
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--color-slate-200);
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(8px);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.6);
 }
 
 .progressStep {
@@ -22,12 +23,13 @@
 .progressStep::after {
   content: '';
   position: absolute;
-  top: 16px;
-  left: calc(50% + 20px);
-  width: calc(100% - 40px);
-  height: 3px;
+  top: 18px;
+  left: calc(50% + 24px);
+  width: calc(100% - 48px);
+  height: 4px;
   background: var(--color-slate-200);
-  transition: var(--transition-base);
+  transition: all var(--transition-base);
+  border-radius: var(--radius-full);
 }
 
 .progressStep:last-child::after {
@@ -39,12 +41,12 @@
 }
 
 .progressStepDone::after {
-  background: var(--color-primary-500);
+  background: var(--color-success);
 }
 
 .progressDot {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: var(--radius-full);
   background: var(--color-slate-100);
   color: var(--color-slate-500);
@@ -55,21 +57,22 @@
   font-weight: 700;
   position: relative;
   z-index: 1;
-  transition: var(--transition-base);
+  transition: all var(--transition-base);
   border: 2px solid var(--color-slate-200);
 }
 
 .progressStepActive .progressDot {
-  background: var(--color-primary-500);
+  background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-600) 100%);
   color: white;
   border-color: var(--color-primary-500);
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.22), 0 4px 10px rgba(99, 102, 241, 0.15);
 }
 
 .progressStepDone .progressDot {
   background: var(--color-success);
   color: white;
   border-color: var(--color-success);
+  box-shadow: 0 4px 10px rgba(34, 197, 94, 0.15);
 }
 
 .progressLabel {
@@ -82,7 +85,7 @@
 
 .progressStepActive .progressLabel {
   color: var(--color-primary-600);
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .progressStepDone .progressLabel {
@@ -91,18 +94,20 @@
 
 /* Subject Row */
 .subjectRow {
-  background: var(--color-slate-50);
-  border-radius: var(--radius-sm);
-  padding: var(--space-5);
-  margin-bottom: var(--space-5);
+  background: rgba(248, 250, 252, 0.6);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  margin-bottom: var(--space-6);
   border: 1px solid var(--color-slate-200);
   animation: fadeIn 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-  transition: var(--transition-base);
+  transition: all var(--transition-base);
 }
 
 .subjectRow:hover {
-  border-color: var(--color-primary-200);
-  box-shadow: var(--shadow-sm);
+  border-color: var(--color-primary-300);
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 10px 25px -10px rgba(15, 23, 42, 0.08);
+  transform: translateY(-2px);
 }
 
 .subjectRowHeader {
@@ -114,7 +119,7 @@
 
 .subjectNumber {
   font-size: var(--font-size-sm);
-  font-weight: 700;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--color-primary-600);
@@ -139,7 +144,7 @@
   background: var(--color-danger);
   color: white;
   border-color: var(--color-danger);
-  transform: scale(1.05);
+  transform: scale(1.1);
 }
 
 .subjectFields {
@@ -152,23 +157,24 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-3) var(--space-5);
-  background: hsl(245, 100%, 98%);
+  padding: var(--space-4) var(--space-5);
+  background: hsl(245, 100%, 99%);
   color: var(--color-primary-600);
   border: 1.5px dashed var(--color-primary-300);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   font-size: var(--font-size-sm);
   font-weight: 700;
   cursor: pointer;
-  transition: var(--transition-fast);
+  transition: all var(--transition-fast);
   margin-top: var(--space-2);
   width: 100%;
   justify-content: center;
 }
 
 .addBtn:hover {
-  background: hsl(245, 100%, 95%);
+  background: hsl(245, 100%, 97%);
   border-color: var(--color-primary-500);
+  transform: translateY(-1px);
 }
 
 /* Fee Box */
@@ -176,14 +182,26 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--space-5) var(--space-6);
+  padding: var(--space-6) var(--space-8);
   background: linear-gradient(135deg, hsl(245, 100%, 97%), hsl(186, 100%, 97%));
-  border-radius: var(--radius-sm);
-  margin-top: var(--space-6);
+  border-radius: var(--radius-md);
+  margin-top: var(--space-8);
   border: 1px solid var(--color-primary-100);
   font-size: var(--font-size-base);
   font-weight: 600;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 8px 20px -8px rgba(99, 102, 241, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.feeBox::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-primary-500), var(--color-accent-400));
 }
 
 .feeBox strong {
@@ -194,16 +212,16 @@
 
 .feeBreakdown {
   margin-top: var(--space-4);
-  padding: var(--space-4);
+  padding: var(--space-5);
   background: var(--color-slate-100);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   border: 1px solid var(--color-slate-200);
 }
 
 .feeRow {
   display: flex;
   justify-content: space-between;
-  padding: var(--space-2) 0;
+  padding: var(--space-3) 0;
   font-size: var(--font-size-sm);
   border-bottom: 1px solid var(--color-slate-200);
   font-weight: 500;
@@ -216,21 +234,22 @@
 /* Sub section */
 .subSectionTitle {
   font-size: var(--font-size-base);
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: -0.01em;
   color: var(--color-slate-800);
-  margin: var(--space-6) 0 var(--space-4);
+  margin: var(--space-8) 0 var(--space-4);
   padding-bottom: var(--space-2);
   border-bottom: 1.5px solid var(--color-slate-200);
 }
 
 /* Declaration */
 .declarationBox {
-  margin-top: var(--space-6);
-  padding: var(--space-5);
-  background: hsl(35, 92%, 96%);
-  border: 1.5px solid rgba(245, 158, 11, 0.15);
-  border-radius: var(--radius-sm);
+  margin-top: var(--space-8);
+  padding: var(--space-6);
+  background: hsl(35, 92%, 98%);
+  border: 1.5px dashed var(--color-warning);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
 }
 
 .declarationLabel {

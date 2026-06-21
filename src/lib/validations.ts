@@ -16,7 +16,7 @@ export const RegisterSchema = z.object({
     .string()
     .min(2, 'Name with initials is required')
     .max(100, 'Name with initials is too long'),
-  title: z.enum(['MR', 'MS'], { message: 'Please select a title' }),
+  title: z.enum(['MR', 'MS', 'MISS', 'MRS'], { message: 'Please select a title' }),
   email: z.string().email('Please enter a valid email address'),
   password: z
     .string()
@@ -45,7 +45,7 @@ export const StudentDetailsSchema = z.object({
     .string()
     .min(2, 'Name with initials is required')
     .max(100, 'Name with initials is too long'),
-  title: z.enum(['MR', 'MS'], { message: 'Please select a title' }),
+  title: z.enum(['MR', 'MS', 'MISS', 'MRS'], { message: 'Please select a title' }),
   email: z.string().email('Please enter a valid email address'),
   permanentAddress: z.string().min(5, 'Address is required'),
   phoneHome: z.string().optional().nullable(),
@@ -112,7 +112,7 @@ export const ExamPeriodSchema = z.object({
 export const UpdateUserSchema = z.object({
   fullName: z.string().min(2).optional(),
   nameWithInitials: z.string().min(2).optional(),
-  title: z.enum(['MR', 'MS']).optional(),
+  title: z.enum(['MR', 'MS', 'MISS', 'MRS']).optional(),
   email: z.string().email().optional(),
   role: z.enum(['STUDENT', 'STAFF', 'REGISTRAR', 'SUPER_ADMIN']).optional(),
   permanentAddress: z.string().optional(),

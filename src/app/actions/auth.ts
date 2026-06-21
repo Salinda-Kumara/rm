@@ -133,7 +133,7 @@ export async function register(prevState: AuthState, formData: FormData): Promis
       email: data.email.toLowerCase(),
       passwordHash,
       role: 'STUDENT',
-      title: data.title as 'MR' | 'MS',
+      title: data.title as 'MR' | 'MS' | 'MISS' | 'MRS',
       fullName: data.fullName,
       nameWithInitials: data.nameWithInitials,
       permanentAddress: data.permanentAddress,

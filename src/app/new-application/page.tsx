@@ -31,23 +31,19 @@ export default async function PublicNewApplicationPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--color-slate-50)' }}>
+    <div style={{
+      minHeight: '100vh',
+      backgroundImage: "linear-gradient(rgba(241, 245, 249, 0.7), rgba(241, 245, 249, 0.7)), url('/CA.jpg')",
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundAttachment: 'fixed',
+      backgroundRepeat: 'no-repeat'
+    }}>
       {/* Premium Public Header */}
       <header className={styles.mobileHeader} style={{ display: 'flex', padding: '0 var(--space-8)', height: '70px', background: 'white', borderBottom: '1px solid var(--color-slate-200)', justifyContent: 'space-between', alignItems: 'center' }}>
         <div className={styles.mobileHeaderBrand}>
           <span className={styles.mobileHeaderLogo} style={{ padding: '6px 12px', fontSize: 'var(--font-size-base)' }}>SAB</span>
           <span className={styles.mobileHeaderTitle} style={{ fontSize: 'var(--font-size-base)', fontWeight: '800' }}>Exam Application Portal</span>
-        </div>
-        <div>
-          {session ? (
-            <Link href="/dashboard/student" className={styles.btnSecondary} style={{ fontSize: 'var(--font-size-xs)' }}>
-              🎓 Student Portal
-            </Link>
-          ) : (
-            <Link href="/login" className={styles.btnSecondary} style={{ fontSize: 'var(--font-size-xs)' }}>
-              🚪 Staff Sign In
-            </Link>
-          )}
         </div>
       </header>
 

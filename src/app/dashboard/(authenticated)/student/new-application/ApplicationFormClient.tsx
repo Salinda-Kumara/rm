@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useActionState, startTransition } from 'react'
-import { createApplication, type ApplicationState } from '@/app/actions/applications'
+import { createApplication, getStudentByNicOrPassport, type ApplicationState } from '@/app/actions/applications'
 import styles from '@/app/dashboard/dashboard.module.css'
 import formStyles from './form.module.css'
 
@@ -60,7 +60,7 @@ export default function ApplicationFormClient({
   const [step, setStep] = useState(1)
   const [examPeriodId, setExamPeriodId] = useState('')
   const [studentDetails, setStudentDetails] = useState({
-    title: 'MR' as 'MR' | 'MS',
+    title: 'MR' as 'MR' | 'MS' | 'MISS' | 'MRS',
     fullName: '',
     nameWithInitials: '',
     email: '',
@@ -71,6 +71,63 @@ export default function ApplicationFormClient({
     permanentAddress: '',
     intake: '',
   })
+  const [isSearchingNic, setIsSearchingNic] = useState(false)
+  const [searchMessage, setSearchMessage] = useState<{ type: 'success' | 'info' | 'error'; text: string } | null>(null)
+  const [autofilledFields, setAutofilledFields] = useState<Record<string, boolean>>({})
+
+  async function handleNicSearch(nic: string) {
+    const trimmedNic = nic.trim()
+    if (!trimmedNic) return
+
+    setIsSearchingNic(true)
+    setSearchMessage(null)
+    try {
+      const student = await getStudentByNicOrPassport(trimmedNic)
+      if (student) {
+        setStudentDetails({
+          title: (student.title || 'MR') as 'MR' | 'MS' | 'MISS' | 'MRS',
+          fullName: (student.fullName || '').toUpperCase(),
+          nameWithInitials: student.nameWithInitials || '',
+          email: student.email || '',
+          nicPassportNo: trimmedNic,
+          sabRegistrationNo: student.sabRegistrationNo || '',
+          phoneMobile: student.phoneMobile || '',
+          phoneHome: student.phoneHome || '',
+          permanentAddress: student.permanentAddress || '',
+          intake: student.intake || '',
+        })
+        setAutofilledFields({
+          title: true,
+          fullName: true,
+          nameWithInitials: true,
+          email: true,
+          sabRegistrationNo: true,
+          phoneMobile: true,
+          phoneHome: !!student.phoneHome,
+          permanentAddress: !!student.permanentAddress,
+          intake: true,
+        })
+        setSearchMessage({
+          type: 'success',
+          text: `Found student details for ${student.fullName}. Fields autofilled!`,
+        })
+      } else {
+        setSearchMessage({
+          type: 'info',
+          text: 'No existing student record found. You can enter your details manually.',
+        })
+      }
+    } catch (err) {
+      console.error('Failed to search student by NIC:', err)
+      setSearchMessage({
+        type: 'error',
+        text: 'Error searching database for student record.',
+      })
+    } finally {
+      setIsSearchingNic(false)
+    }
+  }
+
   const [subjects, setSubjects] = useState<SubjectRow[]>([
     { courseId: '', category: 'REPEAT', caMarks: null, upcomingExamDate: '', upcomingExamIntake: '' },
   ])
@@ -201,49 +258,185 @@ export default function ApplicationFormClient({
         <div className={styles.detailCard}>
           <h3 className={styles.detailCardTitle}>👤 Student Personal Information</h3>
           <div className={formStyles.subjectFields}>
-            <div className={styles.dashFormGroup}>
-              <label className={styles.dashFormLabel}>Title *</label>
-              <select className={styles.dashFormInput} value={studentDetails.title} onChange={(e) => setStudentDetails({ ...studentDetails, title: e.target.value as 'MR' | 'MS' })} required>
-                <option value="MR">Mr.</option>
-                <option value="MS">Ms.</option>
-              </select>
+            <div style={{ display: 'flex', gap: 'var(--space-4)', gridColumn: '1 / -1', flexWrap: 'wrap' }}>
+              <div className={styles.dashFormGroup} style={{ flex: 1, minWidth: '200px' }}>
+                <label className={styles.dashFormLabel}>NIC or Passport No *</label>
+                <input
+                  type="text"
+                  className={styles.dashFormInput}
+                  value={studentDetails.nicPassportNo}
+                  onChange={(e) => {
+                    setStudentDetails({ ...studentDetails, nicPassportNo: e.target.value })
+                    if (searchMessage) setSearchMessage(null)
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      handleNicSearch(studentDetails.nicPassportNo)
+                    }
+                  }}
+                  onBlur={() => {
+                    handleNicSearch(studentDetails.nicPassportNo)
+                  }}
+                  placeholder="e.g. 199912345678"
+                  required
+                />
+                {isSearchingNic && (
+                  <span style={{ fontSize: '0.75rem', color: 'var(--color-primary-500)', marginTop: '4px', display: 'block' }}>
+                    🔍 Searching database...
+                  </span>
+                )}
+                {searchMessage && (
+                  <span style={{
+                    fontSize: '0.75rem',
+                    color: searchMessage.type === 'success' ? 'var(--color-success)' : searchMessage.type === 'error' ? 'var(--color-danger)' : 'var(--color-slate-500)',
+                    marginTop: '4px',
+                    display: 'block',
+                    fontWeight: 500
+                  }}>
+                    {searchMessage.type === 'success' ? '✓ ' : 'ℹ️ '}{searchMessage.text}
+                  </span>
+                )}
+              </div>
+              <div className={styles.dashFormGroup} style={{ flex: 1, minWidth: '200px' }}>
+                <label className={styles.dashFormLabel}>SAB Registration No *</label>
+                <input
+                  type="text"
+                  className={styles.dashFormInput}
+                  value={studentDetails.sabRegistrationNo}
+                  onChange={(e) => {
+                    setStudentDetails({ ...studentDetails, sabRegistrationNo: e.target.value })
+                    setAutofilledFields({ ...autofilledFields, sabRegistrationNo: false })
+                  }}
+                  style={autofilledFields.sabRegistrationNo ? { color: 'var(--color-primary-600)', fontWeight: 600 } : {}}
+                  placeholder="e.g. SAB/2021/001"
+                  required
+                />
+              </div>
             </div>
-            <div className={styles.dashFormGroup}>
-              <label className={styles.dashFormLabel}>Full Name *</label>
-              <input type="text" className={styles.dashFormInput} value={studentDetails.fullName} onChange={(e) => setStudentDetails({ ...studentDetails, fullName: e.target.value })} placeholder="e.g. John Doe" required />
+            <div style={{ display: 'flex', gap: 'var(--space-4)', gridColumn: '1 / -1', flexWrap: 'wrap' }}>
+              <div className={styles.dashFormGroup} style={{ width: '120px', flexShrink: 0 }}>
+                <label className={styles.dashFormLabel}>Title *</label>
+                <select
+                  className={styles.dashFormInput}
+                  value={studentDetails.title}
+                  onChange={(e) => {
+                    setStudentDetails({ ...studentDetails, title: e.target.value as 'MR' | 'MS' | 'MISS' | 'MRS' })
+                    setAutofilledFields({ ...autofilledFields, title: false })
+                  }}
+                  style={autofilledFields.title ? { color: 'var(--color-primary-600)', fontWeight: 600 } : {}}
+                  required
+                >
+                  <option value="MR">Mr.</option>
+                  <option value="MS">Ms.</option>
+                  <option value="MISS">Miss</option>
+                  <option value="MRS">Mrs.</option>
+                </select>
+              </div>
+              <div className={styles.dashFormGroup} style={{ flex: 1, minWidth: '200px' }}>
+                <label className={styles.dashFormLabel}>Full Name * (In block capital letters)</label>
+                <input
+                  type="text"
+                  className={styles.dashFormInput}
+                  value={studentDetails.fullName}
+                  onChange={(e) => {
+                    setStudentDetails({ ...studentDetails, fullName: e.target.value.toUpperCase() })
+                    setAutofilledFields({ ...autofilledFields, fullName: false })
+                  }}
+                  style={autofilledFields.fullName ? { color: 'var(--color-primary-600)', fontWeight: 600 } : {}}
+                  placeholder="e.g. JOHN DOE"
+                  required
+                />
+              </div>
             </div>
             <div className={styles.dashFormGroup}>
               <label className={styles.dashFormLabel}>Name with Initials *</label>
-              <input type="text" className={styles.dashFormInput} value={studentDetails.nameWithInitials} onChange={(e) => setStudentDetails({ ...studentDetails, nameWithInitials: e.target.value })} placeholder="e.g. J. Doe" required />
+              <input
+                type="text"
+                className={styles.dashFormInput}
+                value={studentDetails.nameWithInitials}
+                onChange={(e) => {
+                  setStudentDetails({ ...studentDetails, nameWithInitials: e.target.value })
+                  setAutofilledFields({ ...autofilledFields, nameWithInitials: false })
+                }}
+                style={autofilledFields.nameWithInitials ? { color: 'var(--color-primary-600)', fontWeight: 600 } : {}}
+                placeholder="e.g. J. Doe"
+                required
+              />
             </div>
             <div className={styles.dashFormGroup}>
               <label className={styles.dashFormLabel}>Email *</label>
-              <input type="email" className={styles.dashFormInput} value={studentDetails.email} onChange={(e) => setStudentDetails({ ...studentDetails, email: e.target.value })} placeholder="e.g. john@example.com" required />
-            </div>
-            <div className={styles.dashFormGroup}>
-              <label className={styles.dashFormLabel}>NIC or Passport No *</label>
-              <input type="text" className={styles.dashFormInput} value={studentDetails.nicPassportNo} onChange={(e) => setStudentDetails({ ...studentDetails, nicPassportNo: e.target.value })} placeholder="e.g. 199912345678" required />
-            </div>
-            <div className={styles.dashFormGroup}>
-              <label className={styles.dashFormLabel}>SAB Registration No *</label>
-              <input type="text" className={styles.dashFormInput} value={studentDetails.sabRegistrationNo} onChange={(e) => setStudentDetails({ ...studentDetails, sabRegistrationNo: e.target.value })} placeholder="e.g. SAB/2021/001" required />
+              <input
+                type="email"
+                className={styles.dashFormInput}
+                value={studentDetails.email}
+                onChange={(e) => {
+                  setStudentDetails({ ...studentDetails, email: e.target.value })
+                  setAutofilledFields({ ...autofilledFields, email: false })
+                }}
+                style={autofilledFields.email ? { color: 'var(--color-primary-600)', fontWeight: 600 } : {}}
+                placeholder="e.g. john@example.com"
+                required
+              />
             </div>
             <div className={styles.dashFormGroup}>
               <label className={styles.dashFormLabel}>Mobile Number *</label>
-              <input type="text" className={styles.dashFormInput} value={studentDetails.phoneMobile} onChange={(e) => setStudentDetails({ ...studentDetails, phoneMobile: e.target.value })} placeholder="e.g. 0771234567" required />
+              <input
+                type="text"
+                className={styles.dashFormInput}
+                value={studentDetails.phoneMobile}
+                onChange={(e) => {
+                  setStudentDetails({ ...studentDetails, phoneMobile: e.target.value })
+                  setAutofilledFields({ ...autofilledFields, phoneMobile: false })
+                }}
+                style={autofilledFields.phoneMobile ? { color: 'var(--color-primary-600)', fontWeight: 600 } : {}}
+                placeholder="e.g. 0771234567"
+                required
+              />
             </div>
             <div className={styles.dashFormGroup}>
               <label className={styles.dashFormLabel}>Home Number</label>
-              <input type="text" className={styles.dashFormInput} value={studentDetails.phoneHome ?? ''} onChange={(e) => setStudentDetails({ ...studentDetails, phoneHome: e.target.value })} placeholder="e.g. 0111234567" />
+              <input
+                type="text"
+                className={styles.dashFormInput}
+                value={studentDetails.phoneHome ?? ''}
+                onChange={(e) => {
+                  setStudentDetails({ ...studentDetails, phoneHome: e.target.value })
+                  setAutofilledFields({ ...autofilledFields, phoneHome: false })
+                }}
+                style={autofilledFields.phoneHome ? { color: 'var(--color-primary-600)', fontWeight: 600 } : {}}
+                placeholder="e.g. 0111234567"
+              />
             </div>
             <div className={styles.dashFormGroup}>
               <label className={styles.dashFormLabel}>Intake *</label>
-              <input type="text" className={styles.dashFormInput} value={studentDetails.intake} onChange={(e) => setStudentDetails({ ...studentDetails, intake: e.target.value })} placeholder="e.g. Intake 38" required />
+              <input
+                type="text"
+                className={styles.dashFormInput}
+                value={studentDetails.intake}
+                onChange={(e) => {
+                  setStudentDetails({ ...studentDetails, intake: e.target.value })
+                  setAutofilledFields({ ...autofilledFields, intake: false })
+                }}
+                style={autofilledFields.intake ? { color: 'var(--color-primary-600)', fontWeight: 600 } : {}}
+                placeholder="e.g. Intake 38"
+                required
+              />
             </div>
           </div>
           <div className={styles.dashFormGroup} style={{ marginTop: 'var(--space-4)' }}>
             <label className={styles.dashFormLabel}>Permanent Address *</label>
-            <textarea className={styles.dashFormTextarea} value={studentDetails.permanentAddress} onChange={(e) => setStudentDetails({ ...studentDetails, permanentAddress: e.target.value })} placeholder="Enter your full permanent address..." required />
+            <textarea
+              className={styles.dashFormTextarea}
+              value={studentDetails.permanentAddress}
+              onChange={(e) => {
+                setStudentDetails({ ...studentDetails, permanentAddress: e.target.value })
+                setAutofilledFields({ ...autofilledFields, permanentAddress: false })
+              }}
+              style={autofilledFields.permanentAddress ? { color: 'var(--color-primary-600)', fontWeight: 600 } : {}}
+              placeholder="Enter your full permanent address..."
+              required
+            />
           </div>
         </div>
       )}

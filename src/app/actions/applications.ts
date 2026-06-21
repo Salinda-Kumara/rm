@@ -11,6 +11,7 @@ import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 
 import { saveUploadedFile } from '@/lib/upload'
+import studentsRegistry from '@/lib/students_registry.json'
 
 export type ApplicationState = {
   errors?: Record<string, string[]>
@@ -329,3 +330,71 @@ export async function getApplicationById(id: string) {
 
   return application
 }
+
+export async function getStudentByNicOrPassport(nicPassportNo: string) {
+  if (!nicPassportNo) return null
+  
+  const trimmed = nicPassportNo.trim()
+  if (trimmed === '') return null
+
+  // 1. Check database first (for registered students or updated profiles)
+  try {
+    const student = await prisma.user.findFirst({
+      where: {
+        nicPassportNo: { equals: trimmed, mode: 'insensitive' },
+        role: 'STUDENT',
+      },
+      select: {
+        title: true,
+        fullName: true,
+        nameWithInitials: true,
+        email: true,
+        sabRegistrationNo: true,
+        phoneMobile: true,
+        phoneHome: true,
+        permanentAddress: true,
+        intake: true,
+      },
+    })
+    if (student) {
+      return {
+        title: student.title || 'MR',
+        fullName: student.fullName,
+        nameWithInitials: student.nameWithInitials || '',
+        email: student.email,
+        sabRegistrationNo: student.sabRegistrationNo || '',
+        phoneMobile: student.phoneMobile || '',
+        phoneHome: student.phoneHome || '',
+        permanentAddress: student.permanentAddress || '',
+        intake: student.intake || '',
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching student from DB:', error)
+  }
+
+  // 2. Fallback to the loaded Excel students registry JSON
+  const registry = studentsRegistry as Record<string, {
+    title: string
+    fullName: string
+    nameWithInitials: string
+    email: string
+    sabRegistrationNo: string
+    phoneMobile: string
+    phoneHome: string
+    permanentAddress: string
+    intake: string
+  }>
+
+  // Find match case-insensitively in JSON keys
+  const targetKey = Object.keys(registry).find(
+    (key) => key.toLowerCase() === trimmed.toLowerCase()
+  )
+  
+  if (targetKey) {
+    return registry[targetKey]
+  }
+
+  return null
+}
+

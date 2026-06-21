@@ -28,7 +28,7 @@ export default async function PrintApplicationPage(props: { params: Promise<{ id
   const nicChars = nic.padEnd(12, ' ').substring(0, 12).split('')
 
   // Title formatting
-  const titlePrefix = user.title === 'MR' ? 'Mr.' : user.title === 'MS' ? 'Ms.' : ''
+  const titlePrefix = user.title === 'MR' ? 'Mr.' : user.title === 'MS' ? 'Ms.' : user.title === 'MISS' ? 'Miss' : user.title === 'MRS' ? 'Mrs.' : ''
   const nameWithTitle = titlePrefix ? `${titlePrefix} ${user.nameWithInitials}` : user.nameWithInitials
 
   return (
