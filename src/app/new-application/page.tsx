@@ -33,7 +33,7 @@ export default async function PublicNewApplicationPage() {
   return (
     <div style={{
       minHeight: '100vh',
-      backgroundImage: "linear-gradient(rgba(241, 245, 249, 0.7), rgba(241, 245, 249, 0.7)), url('/CA.jpg')",
+      backgroundImage: "linear-gradient(rgba(109, 102, 102, 0.85), rgba(102, 119, 153, 0.85)), url('/CA.jpg')",
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundAttachment: 'fixed',
@@ -45,6 +45,25 @@ export default async function PublicNewApplicationPage() {
           <span className={styles.mobileHeaderLogo} style={{ padding: '6px 12px', fontSize: 'var(--font-size-base)' }}>SAB</span>
           <span className={styles.mobileHeaderTitle} style={{ fontSize: 'var(--font-size-base)', fontWeight: '800' }}>Exam Application Portal</span>
         </div>
+        <Link
+          href="/login"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '8px 18px',
+            fontSize: 'var(--font-size-sm)',
+            fontWeight: '700',
+            color: 'var(--color-primary-600)',
+            background: 'var(--color-primary-50, hsl(245, 100%, 97%))',
+            border: '1.5px solid var(--color-primary-200, hsl(245, 80%, 90%))',
+            borderRadius: 'var(--radius-sm)',
+            textDecoration: 'none',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          🔐 Staff Login
+        </Link>
       </header>
 
       {/* Form Area */}

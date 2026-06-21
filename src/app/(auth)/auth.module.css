@@ -9,9 +9,17 @@
 }
 
 @keyframes gradientBG {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .brandSide {
@@ -24,6 +32,18 @@
   color: white;
   position: relative;
   z-index: 1;
+  background: url('/CA.jpg') center / cover no-repeat;
+}
+
+.brandSide::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg,
+      rgba(15, 23, 42, 0.88) 0%,
+      rgba(30, 27, 75, 0.82) 50%,
+      rgba(15, 23, 42, 0.88) 100%);
+  z-index: -1;
 }
 
 .brandLogo {
